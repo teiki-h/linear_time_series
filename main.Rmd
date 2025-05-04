@@ -4,18 +4,24 @@ output: html_notebook
 ---
 # import data 
 ```{r}
-install.packages('dyplr')
+install.packages('fUnitRoots')
 ```
 
 ```{r}
 library('forecast')
-library('dyplr')
+library('dplyr')
+library('zoo')
+library('tseries')
+library('fUnitRoots')
 ```
 
 
 ```{r}
 data <- read.csv2('data/valeurs_mensuelles.csv')
 data <- data[4:nrow(data),]
+data <- data.frame(date = as.yearmon(data$Libellé),
+                 x =as.numeric(data$Indice.CVS.CJO.de.la.production.industrielle..base.100.en.2021....Commerce.d.électricité..NAF.rév..2..niveau.classe..poste.35.14.))
+x <- zoo(data$x, order.by = data$date)
 ```
 
 # Part I
@@ -30,7 +36,23 @@ via des systèmes de distribution de courant exploités par d'autres
 Produits associés : 35.14.10
 
 ## question 2
+Firstly we will graphically represent our serie and the differentiated serie of order 1.
+```{r}
+dx <- diff(x,1)
+plot(cbind(x,dx))
+```
+At first, the serie seem to have a linear deterministic trend which does not seem to hold after 2010. The first difference of the serie seem stable around 0 and could be stationnary, we supose that the serie is I(1). To test this we will conduct a UR test.
 
+Given that the serie have a somewhat linear trends with positive coefficient in time
+d
+```{r}
+a<- adf.test(x)
+str(a)
+```
+effectivement non stationnaire (pas étonnant), on différencie
+```{r}
+adf.test(diff(x))
+```
 # Part II
 
 # Part III
